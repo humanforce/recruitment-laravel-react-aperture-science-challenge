@@ -1,6 +1,6 @@
 # Software Engineer Candidate technical challenge
 
-As part of the recruitment process at intelliHR, we ask that complete this code challenge.  We will review your submission and then conduct a code review in a formal interview setting.
+As part of the recruitment process at Humanforce, we ask that complete this code challenge.  We will review your submission and then conduct a code review in a formal interview setting.
 
 In this repository you will find a simple application that produces a React UI which communicates via GraphQL to a Laravel service and Postgres database.  The application will serve two pages, a login page and a subjects list.  The application stack also includes unit and e2e tests.
 
@@ -41,7 +41,7 @@ Finally, launch the application with:
 You may now find the nextjs application served at localhost:3000 / host.docker.internal:3000.  You may also access the laravel application at port 80 (though this will just return a Hello World).
 
 The seeding steps above will create the following user:
-**Email:** GLaDOS@aperture.com 
+**Email:** GLaDOS@aperture.com
 **Password:** ISawDeer
 
 ![Login page](./login.png)
@@ -77,7 +77,7 @@ Please complete the following user stories relative to the role you are applying
 2. As an authenticated user, I want to be able to sort testing subjects by age and testing chamber from within the interface.
 3. As an authenticated user, I want to be able to sort testing subjects by age and testing chamber in my API requests.
 
-**Software Engineer I:** 
+**Software Engineer I:**
 1. As an authenticated user, I want to be able to create testing subject records.
 2. As an authenticated user, I want to be able to edit testing subject records.
 
