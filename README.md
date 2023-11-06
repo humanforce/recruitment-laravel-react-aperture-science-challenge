@@ -74,6 +74,19 @@ Please complete the following user stories relative to the role you are applying
 --header 'Content-Type: application/json' \
 --data-raw '{"query":"query {\r\n    subjects(page: 1) {\r\n        data {\r\n            id\r\n            name\r\n        }\r\n    }\r\n}","variables":{}}'
 ```
+
+```
+curl webserver/graphql -X POST --header 'Content-Type: application/json' --data-raw '{"query":" query { subjects { id name date_of_birth test_chamber date_of_birth score alive created_at updated_at } } "}'
+```
+
+```
+curl webserver/graphql -X POST --header 'Content-Type: application/json' --data-raw '{"query":" query { user (id: 1) { id name } } "}'
+```
+
+```
+curl webserver/graphql -X POST --header 'Content-Type: application/json' --data-raw '{"query":" query { subjects (orderBy: [{ column: CREATED_AT, order: ASC }]) { id name created_at } } "}'
+```
+
 2. As an authenticated user, I want to be able to sort testing subjects by age and testing chamber from within the interface.
 3. As an authenticated user, I want to be able to sort testing subjects by age and testing chamber in my API requests.
 

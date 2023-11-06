@@ -2,9 +2,9 @@
     "pluginsFile": false,
     "supportFile": false,
     "video": false,
-    "baseUrl": "http://host.docker.internal",
+    "baseUrl": "http://host.docker.nextjs:3000",
     "env": {
-        "email": "foo@foo.com",
-        "password": "bar"
+        "email": "GLaDOS@aperture.com",
+        "password": "ISawDeer"
     }
 }

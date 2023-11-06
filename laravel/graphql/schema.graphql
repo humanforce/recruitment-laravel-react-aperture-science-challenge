@@ -7,9 +7,9 @@ scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date
 type Query {
     users: [User!]! @paginate(defaultCount: 10) @guard
     user(id: ID @eq): User @find @guard
-    subjects(orderBy: _ @orderBy(columns: ["created_at"])): [Subject!]! @all
-    subject(id: ID @eq): Subject @find
-    me: User @auth
+    subjects(orderBy: _ @orderBy(columns: ["created_at", "date_of_birth", "test_chamber"])): [Subject!]! @all @guard
+    subject(id: ID @eq): Subject @find @guard
+    me: User @auth @guard
 }
 
 type Mutation {
