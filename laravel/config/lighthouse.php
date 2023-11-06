@@ -43,7 +43,7 @@ return [
 
             // Apply sanctum auth to the entire route.
             // https://laravel.com/docs/10.x/sanctum#protecting-routes
-            'auth:sanctum'
+            // 'auth:sanctum' // TODO
         ],
 
         /*

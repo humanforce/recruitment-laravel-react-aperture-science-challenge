@@ -142,6 +142,15 @@ export default function editSubject(props: NextPage & {XSRF_TOKEN: string, hostn
                     checked={subject.alive}
                 />
               </div>
+              <div>
+                  <label htmlFor="created_at">Created:</label>
+                  <input
+                      readOnly
+                      type="text"
+                      name="created_at"
+                      value={subject.created_at}
+                  />
+              </div>
               <button type="submit">Edit Subject</button>
             </form>
         )}
