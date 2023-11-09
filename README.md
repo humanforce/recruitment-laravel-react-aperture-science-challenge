@@ -1,6 +1,6 @@
 # Software Engineer Candidate technical challenge
 
-As part of the recruitment process at Humanforce, we ask that complete this code challenge.  We will review your submission and then conduct a code review in a formal interview setting.
+As part of the recruitment process at IntelliHR & Humanforce, we ask that complete this code challenge.  We will review your submission and then conduct a code review in a formal interview setting.
 
 In this repository you will find a simple application that produces a React UI which communicates via GraphQL to a Laravel service and Postgres database.  The application will serve two pages, a login page and a subjects list.  The application stack also includes unit and e2e tests.
 
