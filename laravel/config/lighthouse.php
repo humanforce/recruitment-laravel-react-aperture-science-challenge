@@ -40,6 +40,10 @@ return [
 
             // Logs every incoming GraphQL query.
             // \Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries::class,
+
+            // Apply sanctum auth to the entire route.
+            // https://laravel.com/docs/10.x/sanctum#protecting-routes
+            // 'auth:sanctum' // TODO
         ],
 
         /*

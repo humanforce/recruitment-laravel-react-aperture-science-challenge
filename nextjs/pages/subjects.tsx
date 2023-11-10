@@ -43,7 +43,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
         removeCookie("XSRF-TOKEN");
         setAuth(!(response.status === 204))
         return router.push('/');
-      })
+      });
     } catch (e) {
       console.log(e);
     }
@@ -57,14 +57,19 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
   }
 
-  useEffect(() => {
+  function create() {
+    router.push('/createSubjects');
+  }
+
+  function queryGraph(orderColumn, orderDirection) {
     if (authenticated) {
-      axios.post(
-        `${api}/graphql`,
-        {
-          query: `
-              query {
-                subjects {
+      let graphQuery = '';
+      if (orderColumn && orderDirection) {
+        graphQuery = `(orderBy: [{ column: ${orderColumn}, order: ${orderDirection} }])`
+      }
+      graphQuery =
+              `query {
+                subjects ${graphQuery} {
                   id
                   name
                   test_chamber
@@ -74,9 +79,13 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
                   created_at
                 }
               }
-            `
-        },
-        { withCredentials: true }
+              `;
+      axios.post(
+          `${api}/graphql`,
+          {
+            query: graphQuery
+          },
+          { withCredentials: true }
       ).then(response => {
         const { subjects = [] } = response.data?.data;
         if (subjects && subjects.length > 0) {
@@ -98,6 +107,15 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
       router.push('/');
       return;
     }
+  }
+
+  function editSubject(subject) {
+    console.log(subject);
+    router.push(`/editSubject/?subject=${subject}`);
+  }
+
+  useEffect(() => {
+    queryGraph();
   }, [authenticated]);
 
   return (
@@ -113,15 +131,15 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
               <tr>
                 <td>ID</td>
                 <td>Name</td>
-                <td>DOB</td>
+                <td onClick={() => queryGraph('DATE_OF_BIRTH', 'ASC')}>DOB ↕</td>
                 <td>Alive</td>
                 <td>Score</td>
-                <td>Test Chamber</td>
+                <td onClick={() => queryGraph('TEST_CHAMBER', 'ASC')}>Test Chamber ↕</td>
               </tr>
             </thead>
             <tbody>
               {subjects.map(subject => (
-                <tr key={subject.id}>
+                <tr onClick={() => editSubject(subject.id)} key={subject.id}>
                   <td>{subject.id}</td>
                   <td>{subject.name}</td>
                   <td>{formatDate(subject.date_of_birth)}</td>
@@ -162,6 +180,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
           </div>
         )}
         {authenticated && <button onClick={logout}>Log out</button>}
+        {authenticated && <button onClick={create}>Create Subjects</button>}
       </section>
     </Layout>
   )
