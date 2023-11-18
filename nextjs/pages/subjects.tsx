@@ -43,6 +43,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
   const [ message, setErrorMessage ] = useState<string>('');
   const [cookie, setCookie, removeCookie] = useCookies(["XSRF-TOKEN"])
   const [sortOrder, setSortOrder] = useState('asc');
+  const [currentSortColumn, setCurrentSortColumn] = useState<keyof Subject | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [ paginatorInfo, setPaginatorInfo ] = useState<PaginatorInfo>({
     total: 0,
@@ -78,6 +79,14 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
 
   const sortSubjects = (key: keyof Subject) => {
     if (!subjects) return;
+
+    // Update sort order and column
+    if (currentSortColumn === key) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortOrder('asc');
+      setCurrentSortColumn(key);
+    }
 
     const sortedSubjects = [...subjects].sort((a, b) => {
       let valueA = a[key];
@@ -180,12 +189,12 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
                       <td>ID</td>
                       <td>Name</td>
                       <td onClick={() => sortSubjects('date_of_birth')} className={styles.sortableHeader}>
-                        DOB {sortOrder === 'asc' ? '↓' : '↑'}
+                        DOB {currentSortColumn === 'date_of_birth' ? (sortOrder === 'asc' ? '↓' : '↑') : '↕'}
                       </td>
                       <td>Alive</td>
                       <td>Score</td>
                       <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
-                        Test Chamber {sortOrder === 'asc' ? '↓' : '↑'}
+                        Test Chamber {currentSortColumn === 'test_chamber' ? (sortOrder === 'asc' ? '↓' : '↑') : '↕'}
                       </td>
                     </tr>
                     </thead>
