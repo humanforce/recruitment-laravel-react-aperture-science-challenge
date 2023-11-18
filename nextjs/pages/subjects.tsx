@@ -234,20 +234,25 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
             </>
         )}
         {paginatorInfo && (
-            <div className={styles.pagination}>
-              <button
-                  onClick={() => fetchPageData(paginatorInfo.currentPage - 1)}
-                  disabled={paginatorInfo.currentPage <= 1}
-              >
-                Previous
-              </button>
-              <button
-                  onClick={() => fetchPageData(paginatorInfo.currentPage + 1)}
-                  disabled={paginatorInfo.currentPage >= paginatorInfo.lastPage}
-              >
-                Next
-              </button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>Page {paginatorInfo.currentPage} of {paginatorInfo.lastPage}</span>
+
+              <div className={styles.pagination}>
+                <button
+                    onClick={() => fetchPageData(paginatorInfo.currentPage - 1)}
+                    disabled={paginatorInfo.currentPage <= 1}
+                    style={{ marginRight: '10px' }}
+                >
+                  Previous
+                </button>
+                <button
+                    onClick={() => fetchPageData(paginatorInfo.currentPage + 1)}
+                    disabled={paginatorInfo.currentPage >= paginatorInfo.lastPage}
+                    style={{ marginRight: '10px' }}
+                >
+                  Next
+                </button>
+              </div>
             </div>
         )}
         {authenticated && <button onClick={logout}>Log out</button>}
