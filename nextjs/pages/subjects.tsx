@@ -19,6 +19,17 @@ interface Subject {
   updated_at?: string
 }
 
+interface PaginatorInfo {
+  total: number;
+  currentPage: number;
+  lastPage: number;
+}
+
+interface SubjectData {
+  data: Subject[];
+  paginatorInfo: PaginatorInfo;
+}
+
 Subjects.getInitialProps = ({ req, res }: NextPageContext) => {
   const cookies = parseCookies(req);
   const { protocol, hostname } = resolveApiHost(req);
@@ -32,6 +43,12 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
   const [ message, setErrorMessage ] = useState<string>('');
   const [cookie, setCookie, removeCookie] = useCookies(["XSRF-TOKEN"])
   const [sortOrder, setSortOrder] = useState('asc');
+  const [isLoading, setIsLoading] = useState(false);
+  const [ paginatorInfo, setPaginatorInfo ] = useState<PaginatorInfo>({
+    total: 0,
+    currentPage: 1,
+    lastPage: 1
+  });
 
   const api = `${props.protocol}//${props.hostname}`
 
@@ -92,46 +109,57 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
 
   useEffect(() => {
     if (authenticated) {
-      axios.post(
+      // Fetch first page data on initial load
+      fetchPageData(1);
+    } else {
+      router.push('/');
+    }
+  }, [authenticated]);
+
+  const fetchPageData = (page: number) => {
+    setIsLoading(true);
+    axios.post(
         `${api}/graphql`,
         {
           query: `
-              query {
-                subjects {
-                  id
-                  name
-                  test_chamber
-                  date_of_birth
-                  score
-                  alive
-                  created_at
-                }
-              }
-            `
+        query GetSubjects($page: Int!) {
+          subjects(page: $page) {
+            data {
+              id
+              name
+              test_chamber
+              date_of_birth
+              score
+              alive
+              created_at
+            }
+            paginatorInfo {
+              total
+              currentPage
+              lastPage
+            }
+          }
+        }
+      `,
+          variables: {
+            page,
+          }
         },
         { withCredentials: true }
-      ).then(response => {
-        const { subjects = [] } = response.data?.data;
-        if (subjects && subjects.length > 0) {
-          return setSubjects(subjects as Subject[]);
-        }
-      }).catch((e) => {
-        console.log(e);
-        if (e.response?.data?.message) {
-          if (e.response?.data?.message === "CSRF token mismatch.") {
-            return setErrorMessage("Your session has expired, please log in again.");
-          } else {
-            return setErrorMessage(e.response?.data?.message);
-          }
-        } else {
-          return setErrorMessage('An error occurred, please try again later.')
-        }
-      })
-    } else {
-      router.push('/');
-      return;
-    }
-  }, [authenticated]);
+    ).then(response => {
+      const { subjects } = response.data?.data || {};
+      if (subjects) {
+        setSubjects(subjects.data);
+        setPaginatorInfo(subjects.paginatorInfo);
+        console.log(paginatorInfo);
+      }
+    }).catch((e) => {
+      // Handle error
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+  };
 
   return (
     <Layout>
@@ -140,63 +168,87 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
         {message && (
           <p data-testid="error-msg">{message}</p>
         )}
-        {subjects && subjects.length > 0 && (
-          <table data-testid="subjects-table">
-            <thead>
-              <tr>
-                <td>ID</td>
-                <td>Name</td>
-                <td onClick={() => sortSubjects('date_of_birth')} className={styles.sortableHeader}>
-                  DOB {sortOrder === 'asc' ? '↓' : '↑'}
-                </td>
-                <td>Alive</td>
-                <td>Score</td>
-                <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
-                  Test Chamber {sortOrder === 'asc' ? '↓' : '↑'}
-                </td>
-              </tr>
-            </thead>
-            <tbody>
-              {subjects.map(subject => (
-                <tr key={subject.id}>
-                  <td>{subject.id}</td>
-                  <td>{subject.name}</td>
-                  <td>{formatDate(subject.date_of_birth)}</td>
-                  <td>{subject.alive ? 'Y' : 'N'}</td>
-                  <td>{subject.score}</td>
-                  <td>{subject.test_chamber}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        {isLoading ? (
+            <div>Loading...</div>
+        ) : (
+            <>
+              {subjects && subjects.length > 0 && (
+                  <table data-testid="subjects-table">
+                    <thead>
+                    <tr>
+                      <td>ID</td>
+                      <td>Name</td>
+                      <td onClick={() => sortSubjects('date_of_birth')} className={styles.sortableHeader}>
+                        DOB {sortOrder === 'asc' ? '↓' : '↑'}
+                      </td>
+                      <td>Alive</td>
+                      <td>Score</td>
+                      <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
+                        Test Chamber {sortOrder === 'asc' ? '↓' : '↑'}
+                      </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {subjects.map(subject => (
+                        <tr key={subject.id}>
+                          <td>{subject.id}</td>
+                          <td>{subject.name}</td>
+                          <td>{formatDate(subject.date_of_birth)}</td>
+                          <td>{subject.alive ? 'Y' : 'N'}</td>
+                          <td>{subject.score}</td>
+                          <td>{subject.test_chamber}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                  </table>
+              )}
+              {!subjects && !message && (
+                  <div className={styles.skeleton} data-testid="skeleton">
+                    <table>
+                      <thead>
+                      <tr>
+                        <td>ID</td>
+                        <td>Name</td>
+                        <td>DOB</td>
+                        <td>Alive</td>
+                        <td>Score</td>
+                        <td>Test Chamber</td>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {Array.from(Array(10).keys()).map(subject => (
+                          <tr key={subject}>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                          </tr>
+                      ))}
+                      </tbody>
+                    </table>
+                  </div>
+              )}
+            </>
         )}
-        {!subjects && !message && (
-          <div className={styles.skeleton} data-testid="skeleton">
-            <table>
-            <thead>
-              <tr>
-                <td>ID</td>
-                <td>Name</td>
-                <td>DOB</td>
-                <td>Alive</td>
-                <td>Score</td>
-                <td>Test Chamber</td>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from(Array(10).keys()).map(subject => (
-                <tr key={subject}>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          </div>
+        {paginatorInfo && (
+            <div className={styles.pagination}>
+              <button
+                  onClick={() => fetchPageData(paginatorInfo.currentPage - 1)}
+                  disabled={paginatorInfo.currentPage <= 1}
+              >
+                Previous
+              </button>
+              <button
+                  onClick={() => fetchPageData(paginatorInfo.currentPage + 1)}
+                  disabled={paginatorInfo.currentPage >= paginatorInfo.lastPage}
+              >
+                Next
+              </button>
+              <span>Page {paginatorInfo.currentPage} of {paginatorInfo.lastPage}</span>
+            </div>
         )}
         {authenticated && <button onClick={logout}>Log out</button>}
       </section>
