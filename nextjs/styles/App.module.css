@@ -111,3 +111,7 @@
 .content table tbody tr:hover td {
   background: rgba(0,0,0,.1)
 }
+
+.sortableHeader {
+  cursor: pointer;
+}

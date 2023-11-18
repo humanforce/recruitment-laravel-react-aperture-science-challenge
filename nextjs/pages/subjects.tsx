@@ -31,7 +31,9 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
   const [ subjects, setSubjects ] = useState<Array<Subject>>();
   const [ message, setErrorMessage ] = useState<string>('');
   const [cookie, setCookie, removeCookie] = useCookies(["XSRF-TOKEN"])
-  const api = `${props.protocol}//${props.hostname}`;
+  const [sortOrder, setSortOrder] = useState('asc');
+
+  const api = `${props.protocol}//${props.hostname}`
 
   const logout = async () => {
     try {
@@ -56,6 +58,37 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     const date = new Date(dateStr);
     return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
   }
+
+  const sortSubjects = (key: keyof Subject) => {
+    if (!subjects) return;
+
+    const sortedSubjects = [...subjects].sort((a, b) => {
+      let valueA = a[key];
+      let valueB = b[key];
+
+      // Convert date strings to timestamps for comparison
+      if (key === 'date_of_birth') {
+        valueA = valueA ? new Date(valueA as string).getTime() : 0;
+        valueB = valueB ? new Date(valueB as string).getTime() : 0;
+      }
+
+      // Compare numbers
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        return sortOrder === 'asc' ? valueA - valueB : valueB - valueA;
+      }
+
+      // Compare strings
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        return sortOrder === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+      }
+
+      // Default comparison for other types (like boolean)
+      return 0;
+    });
+
+    setSubjects(sortedSubjects);
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
 
   useEffect(() => {
     if (authenticated) {
@@ -113,10 +146,14 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
               <tr>
                 <td>ID</td>
                 <td>Name</td>
-                <td>DOB</td>
+                <td onClick={() => sortSubjects('date_of_birth')} className={styles.sortableHeader}>
+                  DOB {sortOrder === 'asc' ? '↓' : '↑'}
+                </td>
                 <td>Alive</td>
                 <td>Score</td>
-                <td>Test Chamber</td>
+                <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
+                  Test Chamber {sortOrder === 'asc' ? '↓' : '↑'}
+                </td>
               </tr>
             </thead>
             <tbody>
