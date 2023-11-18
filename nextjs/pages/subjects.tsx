@@ -82,7 +82,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
         return sortOrder === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
       }
 
-      // Default comparison for other types (like boolean)
+      // Default comparison for other types
       return 0;
     });
 
