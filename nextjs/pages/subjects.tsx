@@ -1,12 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
-import { NextPage, NextPageContext  } from 'next'
-import { useCookies } from "react-cookie"
+import { NextPage, NextPageContext  } from 'next';
+import Link from 'next/link';
+import { useCookies } from 'react-cookie';
 import styles from '../styles/App.module.css'
 import axios from 'axios';
-import { parseCookies, resolveApiHost } from "../helpers/"
-import { useRouter } from 'next/router'
-import Layout from "../components/layout"
+import { parseCookies, resolveApiHost } from '../helpers/';
+import { useRouter } from 'next/router';
+import Layout from "../components/layout";
 
 interface Subject {
   id: number,
@@ -131,25 +132,25 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
         `${api}/graphql`,
         {
           query: `
-        query GetSubjects($page: Int!) {
-          subjects(page: $page) {
-            data {
-              id
-              name
-              test_chamber
-              date_of_birth
-              score
-              alive
-              created_at
+            query GetSubjects($page: Int!) {
+              subjects(page: $page) {
+                data {
+                  id
+                  name
+                  test_chamber
+                  date_of_birth
+                  score
+                  alive
+                  created_at
+                }
+                paginatorInfo {
+                  total
+                  currentPage
+                  lastPage
+                }
+              }
             }
-            paginatorInfo {
-              total
-              currentPage
-              lastPage
-            }
-          }
-        }
-      `,
+          `,
           variables: {
             page,
           }
@@ -163,7 +164,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
         console.log(paginatorInfo);
       }
     }).catch((e) => {
-      // Handle error
+      console.log("Error fetching subjects", e);
     })
     .finally(() => {
       setIsLoading(false);
@@ -176,6 +177,23 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     }
     // Default icon when the column is not the current sort column
     return '↕';
+  };
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= paginatorInfo.lastPage; i++) {
+      pageNumbers.push(
+          <button
+              key={i}
+              onClick={() => fetchPageData(i)}
+              className={paginatorInfo.currentPage === i ? styles.currentPage : ''}
+              style={{ marginRight: '10px' }}
+          >
+            {i}
+          </button>
+      );
+    }
+    return pageNumbers;
   };
 
   return (
@@ -191,34 +209,40 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
         ) : (
             <>
               {subjects && subjects.length > 0 && (
-                  <table data-testid="subjects-table">
-                    <thead>
-                    <tr>
-                      <td>ID</td>
-                      <td>Name</td>
-                      <td onClick={() => sortSubjects('date_of_birth')} className={styles.sortableHeader}>
-                        DOB {getSortIcon('date_of_birth')}
-                      </td>
-                      <td>Alive</td>
-                      <td>Score</td>
-                      <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
-                        Test Chamber {getSortIcon('test_chamber')}
-                      </td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {subjects.map(subject => (
-                        <tr key={subject.id}>
-                          <td>{subject.id}</td>
-                          <td>{subject.name}</td>
-                          <td>{formatDate(subject.date_of_birth)}</td>
-                          <td>{subject.alive ? 'Y' : 'N'}</td>
-                          <td>{subject.score}</td>
-                          <td>{subject.test_chamber}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                  </table>
+                  <>
+                    <Link href="/create-subject">
+                      <a className={styles.linkButton} style={{ marginBottom: '15px' }}>Create Test Subject</a>
+                    </Link>
+
+                    <table data-testid="subjects-table">
+                      <thead>
+                      <tr>
+                        <td>ID</td>
+                        <td>Name</td>
+                        <td onClick={() => sortSubjects('date_of_birth')} className={styles.sortableHeader}>
+                          DOB {getSortIcon('date_of_birth')}
+                        </td>
+                        <td>Alive</td>
+                        <td>Score</td>
+                        <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
+                          Test Chamber {getSortIcon('test_chamber')}
+                        </td>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {subjects.map(subject => (
+                          <tr key={subject.id}>
+                            <td>{subject.id}</td>
+                            <td>{subject.name}</td>
+                            <td>{formatDate(subject.date_of_birth)}</td>
+                            <td>{subject.alive ? 'Y' : 'N'}</td>
+                            <td>{subject.score}</td>
+                            <td>{subject.test_chamber}</td>
+                          </tr>
+                      ))}
+                      </tbody>
+                    </table>
+                  </>
               )}
               {!subjects && !message && (
                   <div className={styles.skeleton} data-testid="skeleton">
@@ -262,6 +286,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
                 >
                   Previous
                 </button>
+                {renderPageNumbers()}
                 <button
                     onClick={() => fetchPageData(paginatorInfo.currentPage + 1)}
                     disabled={paginatorInfo.currentPage >= paginatorInfo.lastPage}
