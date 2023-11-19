@@ -93,19 +93,19 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
         `${api}/graphql`,
         {
           query: `
-          mutation UpdateSubject($id: ID!, $name: String!, $dateOfBirth: DateTime!, $testChamber: Int!, $score: Int!, $alive: Boolean!) {
-            updateSubject(
-              id: $id
-              name: $name
-              date_of_birth: $dateOfBirth
-              test_chamber: $testChamber
-              score: $score
-              alive: $alive
-            ) {
-              id
+            mutation UpdateSubject($id: ID!, $name: String!, $dateOfBirth: DateTime!, $testChamber: Int!, $score: Int!, $alive: Boolean!) {
+              updateSubject(
+                id: $id
+                name: $name
+                date_of_birth: $dateOfBirth
+                test_chamber: $testChamber
+                score: $score
+                alive: $alive
+              ) {
+                id
+              }
             }
-          }
-        `,
+          `,
           variables: {
             id,
             name: formData.name,
