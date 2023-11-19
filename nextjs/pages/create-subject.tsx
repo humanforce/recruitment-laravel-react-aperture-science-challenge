@@ -26,6 +26,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
     alive: false,
   });
 
+  // Constructing the API endpoint
   const api = `${props.protocol}//${props.hostname}`;
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
     }
   }, [authenticated]);
 
-
+  // Handle form changes
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -43,13 +44,14 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
     }));
   };
 
+  // Handle form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setMessageInfo({ message: '', type: '' });
 
     try {
-      // Create subject
+      // Create subject data
       const response = await axios.post(
         `${api}/graphql`,
         {
@@ -81,7 +83,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
         }
       );
 
-      // Handle the response
+      // Set success/error message
       if (response.data.errors) {
         setMessageInfo({ message: 'Error: ' + response.data.errors[0].message, type: 'error' });
       } else {

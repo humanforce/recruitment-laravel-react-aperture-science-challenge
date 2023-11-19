@@ -27,13 +27,14 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
     alive: false,
   });
 
+  // Constructing the API endpoint
   const api = `${props.protocol}//${props.hostname}`;
 
   useEffect(() => {
     if (id) {
       setIsLoadingData(true);
 
-      // Update subject
+      // Get subject data on component mount
       axios.post(
         `${api}/graphql`,
         {
@@ -80,46 +81,49 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
     }));
   };
 
+  // Handle form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoadingUpdate(true);
     setMessageInfo({ message: '', type: '' });
 
     try {
+      // Update subject data
       const response = await axios.post(
-          `${api}/graphql`,
-          {
-            query: `
-            mutation UpdateSubject($id: ID!, $name: String!, $dateOfBirth: DateTime!, $testChamber: Int!, $score: Int!, $alive: Boolean!) {
-              updateSubject(
-                id: $id
-                name: $name
-                date_of_birth: $dateOfBirth
-                test_chamber: $testChamber
-                score: $score
-                alive: $alive
-              ) {
-                id
-              }
+        `${api}/graphql`,
+        {
+          query: `
+          mutation UpdateSubject($id: ID!, $name: String!, $dateOfBirth: DateTime!, $testChamber: Int!, $score: Int!, $alive: Boolean!) {
+            updateSubject(
+              id: $id
+              name: $name
+              date_of_birth: $dateOfBirth
+              test_chamber: $testChamber
+              score: $score
+              alive: $alive
+            ) {
+              id
             }
-          `,
-            variables: {
-              id,
-              name: formData.name,
-              dateOfBirth: formatDate(formData.date_of_birth),
-              testChamber: parseInt(formData.test_chamber),
-              score: parseInt(formData.score),
-              alive: formData.alive
-            }
-          },
-          {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-            },
           }
+        `,
+          variables: {
+            id,
+            name: formData.name,
+            dateOfBirth: formatDate(formData.date_of_birth),
+            testChamber: parseInt(formData.test_chamber),
+            score: parseInt(formData.score),
+            alive: formData.alive
+          }
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       )
 
+      // Set success/error message
       if (response.data.errors) {
         setMessageInfo({ message: 'Error: ' + response.data.errors[0].message, type: 'error' });
       } else {

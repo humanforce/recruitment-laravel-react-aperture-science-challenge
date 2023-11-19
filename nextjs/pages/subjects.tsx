@@ -26,11 +26,6 @@ interface PaginatorInfo {
   lastPage: number;
 }
 
-interface SubjectData {
-  data: Subject[];
-  paginatorInfo: PaginatorInfo;
-}
-
 Subjects.getInitialProps = ({ req, res }: NextPageContext) => {
   const cookies = parseCookies(req);
   const { protocol, hostname } = resolveApiHost(req);
@@ -52,8 +47,10 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     lastPage: 1
   });
 
+  // Constructing the API endpoint
   const api = `${props.protocol}//${props.hostname}`
 
+  // Function to log out the user
   const logout = async () => {
     try {
       await axios({
@@ -70,6 +67,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     }
   }
 
+  // Function to format date strings
   const formatDate = (dateStr: string | undefined) => {
     if (!dateStr) {
       return '???'
@@ -78,6 +76,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
   }
 
+  // Function to sort subjects based on a given key
   const sortSubjects = (key: keyof Subject) => {
     if (!subjects) return;
 
@@ -117,15 +116,16 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
+  // Fetch first page data when component mounts
   useEffect(() => {
     if (authenticated) {
-      // Fetch first page data on initial load
       fetchPageData(1);
     } else {
       router.push('/');
     }
   }, [authenticated]);
 
+  // Function to fetch subjects data for a specific page
   const fetchPageData = (page: number) => {
     setIsLoading(true);
     axios.post(
@@ -158,6 +158,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     { withCredentials: true }
     ).then(response => {
       const { subjects } = response.data?.data || {};
+
       if (subjects) {
         setSubjects(subjects.data);
         setPaginatorInfo(subjects.paginatorInfo);
@@ -170,23 +171,27 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     });
   };
 
+  // Function to get the appropriate sort icon for a column
   const getSortIcon = (columnKey: keyof Subject) => {
     if (currentSortColumn === columnKey) {
       return sortOrder === 'asc' ? '↓' : '↑';
     }
-    // Default icon when the column is not the current sort column
+    // Default icon when the column
+    // is not the current sort column
     return '↕';
   };
 
+  // Function to render page numbers for pagination
   const renderPageNumbers = () => {
     const pageNumbers = [];
+
     for (let i = 1; i <= paginatorInfo.lastPage; i++) {
       pageNumbers.push(
           <button
-              key={i}
-              onClick={() => fetchPageData(i)}
-              className={paginatorInfo.currentPage === i ? styles.currentPage : ''}
-              style={{ marginRight: '10px' }}
+            key={i}
+            onClick={() => fetchPageData(i)}
+            className={paginatorInfo.currentPage === i ? styles.currentPage : ''}
+            style={{ marginRight: '10px' }}
           >
             {i}
           </button>
@@ -203,6 +208,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
           <p data-testid="error-msg">{message}</p>
         )}
 
+        {/* Display loading indicator or subject data */}
         {isLoading ? (
           <div>Loading...</div>
         ) : (
@@ -279,6 +285,8 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
               )}
             </>
         )}
+
+        {/* Pagination Controls */}
         {paginatorInfo && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>Page {paginatorInfo.currentPage} of {paginatorInfo.lastPage}</span>
@@ -302,6 +310,8 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
               </div>
             </div>
         )}
+
+        {/* Logout Button */}
         {authenticated && <button onClick={logout}>Log out</button>}
       </section>
     </Layout>
