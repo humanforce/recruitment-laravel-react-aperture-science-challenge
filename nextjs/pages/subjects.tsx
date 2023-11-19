@@ -161,7 +161,6 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
       if (subjects) {
         setSubjects(subjects.data);
         setPaginatorInfo(subjects.paginatorInfo);
-        console.log(paginatorInfo);
       }
     }).catch((e) => {
       console.log("Error fetching subjects", e);
@@ -227,6 +226,7 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
                         <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
                           Test Chamber {getSortIcon('test_chamber')}
                         </td>
+                        <td>Action</td>
                       </tr>
                       </thead>
                       <tbody>
@@ -238,6 +238,11 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
                             <td>{subject.alive ? 'Y' : 'N'}</td>
                             <td>{subject.score}</td>
                             <td>{subject.test_chamber}</td>
+                            <td>
+                              <Link href={`/edit-subject/${subject.id}`}>
+                                Edit
+                              </Link>
+                            </td>
                           </tr>
                       ))}
                       </tbody>

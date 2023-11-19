@@ -119,9 +119,9 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
 
                 {/* Form Message */}
                 {messageInfo.message && (
-                    <div className={`${styles.formMessage} ${messageInfo.type === 'error' ? styles.errorMessage : ''}`}>
-                      {messageInfo.message}
-                    </div>
+                  <div className={`${styles.formMessage} ${messageInfo.type === 'error' ? styles.errorMessage : ''}`}>
+                    {messageInfo.message}
+                  </div>
                 )}
 
                 <form onSubmit={handleSubmit}>
