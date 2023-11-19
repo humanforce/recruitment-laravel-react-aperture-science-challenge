@@ -129,33 +129,33 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
   const fetchPageData = (page: number) => {
     setIsLoading(true);
     axios.post(
-        `${api}/graphql`,
-        {
-          query: `
-            query GetSubjects($page: Int!) {
-              subjects(page: $page) {
-                data {
-                  id
-                  name
-                  test_chamber
-                  date_of_birth
-                  score
-                  alive
-                  created_at
-                }
-                paginatorInfo {
-                  total
-                  currentPage
-                  lastPage
-                }
-              }
+    `${api}/graphql`,
+    {
+      query: `
+        query GetSubjects($page: Int!) {
+          subjects(page: $page) {
+            data {
+              id
+              name
+              test_chamber
+              date_of_birth
+              score
+              alive
+              created_at
             }
-          `,
-          variables: {
-            page,
+            paginatorInfo {
+              total
+              currentPage
+              lastPage
+            }
           }
-        },
-        { withCredentials: true }
+        }
+      `,
+      variables: {
+        page,
+      }
+    },
+    { withCredentials: true }
     ).then(response => {
       const { subjects } = response.data?.data || {};
       if (subjects) {
