@@ -28,3 +28,10 @@ export function resolveApiHost(req, setLocalhost) {
      origin: protocol + "//" + host,
   };
 }
+
+export function formatDate (dateString)  {
+    const date = new Date(dateString);
+    const formattedDate = date.toISOString().split('T')[0];
+    const currentTime = new Date().toTimeString().split(' ')[0];
+    return `${formattedDate} ${currentTime}`;
+}

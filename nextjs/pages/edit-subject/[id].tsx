@@ -3,7 +3,7 @@ import Layout from '../../components/layout';
 import styles from '../../styles/App.module.css';
 import { useRouter } from 'next/router';
 import {NextPage, NextPageContext} from 'next';
-import { parseCookies, resolveApiHost } from '../../helpers';
+import { parseCookies, resolveApiHost, formatDate } from '../../helpers';
 import Link from 'next/link';
 import axios from 'axios';
 
@@ -16,7 +16,9 @@ EditSubject.getInitialProps = ({ req, res }: NextPageContext) => {
 export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostname: string, protocol: string}) {
   const router = useRouter();
   const { id } = router.query;
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
+  const [messageInfo, setMessageInfo] = useState({ message: '', type: '' });
   const [formData, setFormData] = useState({
     name: '',
     date_of_birth: '',
@@ -29,20 +31,21 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
 
   useEffect(() => {
     if (id) {
-      setIsLoading(true);
+      setIsLoadingData(true);
 
+      // Update subject
       axios.post(
         `${api}/graphql`,
         {
           query: `
             query GetSubject($id: ID!) {
-                subject(id: $id) {
-                  name
-                  date_of_birth
-                  test_chamber
-                  score
-                  alive
-                }
+              subject(id: $id) {
+                name
+                date_of_birth
+                test_chamber
+                score
+                alive
+              }
             }
           `,
           variables: { id }
@@ -63,7 +66,7 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
         console.error("Error fetching subject data", error);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoadingData(false);
       })
     }
   }, [id, api]);
@@ -77,8 +80,58 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
     }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoadingUpdate(true);
+    setMessageInfo({ message: '', type: '' });
+
+    try {
+      const response = await axios.post(
+          `${api}/graphql`,
+          {
+            query: `
+            mutation UpdateSubject($id: ID!, $name: String!, $dateOfBirth: DateTime!, $testChamber: Int!, $score: Int!, $alive: Boolean!) {
+              updateSubject(
+                id: $id
+                name: $name
+                date_of_birth: $dateOfBirth
+                test_chamber: $testChamber
+                score: $score
+                alive: $alive
+              ) {
+                id
+              }
+            }
+          `,
+            variables: {
+              id,
+              name: formData.name,
+              dateOfBirth: formatDate(formData.date_of_birth),
+              testChamber: parseInt(formData.test_chamber),
+              score: parseInt(formData.score),
+              alive: formData.alive
+            }
+          },
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+      )
+
+      if (response.data.errors) {
+        setMessageInfo({ message: 'Error: ' + response.data.errors[0].message, type: 'error' });
+      } else {
+        setMessageInfo({ message: 'Subject updated successfully!', type: 'success' });
+      }
+    } catch (error) {
+      console.error('Error creating subject:', error);
+      setMessageInfo({message: 'An error occurred', type: 'error'});
+    }
+    finally {
+      setIsLoadingUpdate(false);
+    }
   };
 
   return (
@@ -88,12 +141,11 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
             <h1>Edit Test Subject</h1>
 
               <div className={styles.content} style={{ paddingTop: 0 }}>
-
-                {isLoading ? (
+                {isLoadingData ? (
                   <div>Loading...</div>
                 ) : (
                   <>
-                    {/* Back Link */}
+                    {/* Back Button */}
                     <div style={{ marginBottom: '15px' }}>
                       <Link href="/subjects" passHref>
                         <button>
@@ -101,6 +153,13 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
                         </button>
                       </Link>
                     </div>
+
+                    {/* Form Message */}
+                    {messageInfo.message && (
+                      <div className={`${styles.formMessage} ${messageInfo.type === 'error' ? styles.errorMessage : styles.successMessage}`}>
+                        {messageInfo.message}
+                      </div>
+                    )}
 
                     <form onSubmit={handleSubmit}>
                       {/* Name Field */}
@@ -162,12 +221,14 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
                         />
                       </div>
 
+                      {/* Submit Button */}
                       <button
                         type="submit"
                         className={styles.content}
                         style={{ width: 'fit-content' }}
+                        disabled={isLoadingUpdate}
                       >
-                        Update Subject
+                        {isLoadingUpdate ? 'Saving...' : 'Save'}
                       </button>
                     </form>
                   </>

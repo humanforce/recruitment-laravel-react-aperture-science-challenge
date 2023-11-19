@@ -3,7 +3,7 @@ import Layout from '../components/layout';
 import styles from '../styles/App.module.css';
 import axios from 'axios';
 import { NextPage, NextPageContext } from 'next';
-import { parseCookies, resolveApiHost } from '../helpers/';
+import { parseCookies, resolveApiHost, formatDate } from '../helpers/';
 import Link from 'next/link';
 import { useRouter } from "next/router";
 
@@ -43,48 +43,42 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
     }));
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const formattedDate = date.toISOString().split('T')[0];
-    const currentTime = new Date().toTimeString().split(' ')[0];
-    return `${formattedDate} ${currentTime}`;
-  }
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setMessageInfo({ message: '', type: '' });
 
     try {
+      // Create subject
       const response = await axios.post(
-          `${api}/graphql`,
-          {
-            query: `
-              mutation CreateSubject($name: String!, $dateOfBirth: DateTime!, $testChamber: Int!, $score: Int!, $alive: Boolean!) {
-                createSubject(name: $name, date_of_birth: $dateOfBirth, test_chamber: $testChamber, score: $score, alive: $alive) {
-                  id
-                  name
-                  date_of_birth
-                  test_chamber
-                  score
-                  alive
-                }
+        `${api}/graphql`,
+        {
+          query: `
+            mutation CreateSubject($name: String!, $dateOfBirth: DateTime!, $testChamber: Int!, $score: Int!, $alive: Boolean!) {
+              createSubject(name: $name, date_of_birth: $dateOfBirth, test_chamber: $testChamber, score: $score, alive: $alive) {
+                id
+                name
+                date_of_birth
+                test_chamber
+                score
+                alive
               }
-            `,
-            variables: {
-              name: formData.name,
-              dateOfBirth: formatDate(formData.date_of_birth),
-              testChamber: parseInt(formData.test_chamber),
-              score: parseInt(formData.score),
-              alive: formData.alive,
-            },
+            }
+          `,
+          variables: {
+            name: formData.name,
+            dateOfBirth: formatDate(formData.date_of_birth),
+            testChamber: parseInt(formData.test_chamber),
+            score: parseInt(formData.score),
+            alive: formData.alive,
           },
-          {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       // Handle the response
@@ -95,7 +89,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
       }
     } catch (error) {
       console.error('Error creating subject:', error);
-      setMessageInfo({message: 'An error occured', type: 'error'});
+      setMessageInfo({message: 'An error occurred', type: 'error'});
     }
     finally {
       setIsLoading(false);
@@ -108,7 +102,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
           <div className={styles.main}>
             <h1>Create Test Subject</h1>
               <div className={styles.content} style={{ paddingTop: 0 }}>
-                {/* Back Link */}
+                {/* Back Button */}
                 <div style={{ marginBottom: '15px' }}>
                   <Link href="/subjects" passHref>
                     <button>
@@ -180,6 +174,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                     />
                   </div>
 
+                  {/* Submit Button */}
                   <button
                       type="submit"
                       className={styles.content}

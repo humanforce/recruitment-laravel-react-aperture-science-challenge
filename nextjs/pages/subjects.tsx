@@ -204,33 +204,33 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
         )}
 
         {isLoading ? (
-            <div>Loading...</div>
+          <div>Loading...</div>
         ) : (
             <>
               {subjects && subjects.length > 0 && (
-                  <>
-                    <Link href="/create-subject">
-                      <a className={styles.linkButton} style={{ marginBottom: '15px' }}>Create Test Subject</a>
-                    </Link>
+                <>
+                  <Link href="/create-subject">
+                    <a className={styles.linkButton} style={{ marginBottom: '15px' }}>Create Test Subject</a>
+                  </Link>
 
-                    <table data-testid="subjects-table">
+                  <table data-testid="subjects-table">
                       <thead>
-                      <tr>
-                        <td>ID</td>
-                        <td>Name</td>
-                        <td onClick={() => sortSubjects('date_of_birth')} className={styles.sortableHeader}>
-                          DOB {getSortIcon('date_of_birth')}
-                        </td>
-                        <td>Alive</td>
-                        <td>Score</td>
-                        <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
-                          Test Chamber {getSortIcon('test_chamber')}
-                        </td>
-                        <td>Action</td>
-                      </tr>
+                        <tr>
+                          <td>ID</td>
+                          <td>Name</td>
+                          <td onClick={() => sortSubjects('date_of_birth')} className={styles.sortableHeader}>
+                            DOB {getSortIcon('date_of_birth')}
+                          </td>
+                          <td>Alive</td>
+                          <td>Score</td>
+                          <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
+                            Test Chamber {getSortIcon('test_chamber')}
+                          </td>
+                          <td>Action</td>
+                        </tr>
                       </thead>
                       <tbody>
-                      {subjects.map(subject => (
+                        {subjects.map(subject => (
                           <tr key={subject.id}>
                             <td>{subject.id}</td>
                             <td>{subject.name}</td>
@@ -244,10 +244,10 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
                               </Link>
                             </td>
                           </tr>
-                      ))}
+                        ))}
                       </tbody>
-                    </table>
-                  </>
+                  </table>
+                </>
               )}
               {!subjects && !message && (
                   <div className={styles.skeleton} data-testid="skeleton">
