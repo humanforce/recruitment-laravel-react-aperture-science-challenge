@@ -1,10 +1,11 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import Layout from '../components/layout';
 import styles from '../styles/App.module.css';
 import axios from 'axios';
-import {NextPage, NextPageContext} from 'next';
+import { NextPage, NextPageContext } from 'next';
 import { parseCookies, resolveApiHost } from '../helpers/';
 import Link from 'next/link';
+import { useRouter } from "next/router";
 
 CreateSubject.getInitialProps = ({ req, res }: NextPageContext) => {
   const cookies = parseCookies(req);
@@ -13,7 +14,8 @@ CreateSubject.getInitialProps = ({ req, res }: NextPageContext) => {
 }
 
 export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hostname: string, protocol: string}) {
-  const api = `${props.protocol}//${props.hostname}`;
+  const router = useRouter();
+  const [ authenticated, setAuth ] = useState<Boolean>(!!props.XSRF_TOKEN);
   const [isLoading, setIsLoading] = useState(false);
   const [messageInfo, setMessageInfo] = useState({ message: '', type: '' });
   const [formData, setFormData] = useState({
@@ -23,6 +25,15 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
     score: '',
     alive: false,
   });
+
+  const api = `${props.protocol}//${props.hostname}`;
+
+  useEffect(() => {
+    if (!authenticated) {
+      router.push('/');
+    }
+  }, [authenticated]);
+
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
