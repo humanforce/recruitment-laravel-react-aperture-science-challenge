@@ -125,10 +125,10 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                   <div className={styles.inputGroup}>
                     <label>Name:</label>
                     <input
-                        type="text"
-                        name="name"
-                        placeholder="Name"
-                        onChange={handleChange}
+                      type="text"
+                      name="name"
+                      placeholder="Name"
+                      onChange={handleChange}
                     />
                   </div>
 
@@ -136,10 +136,10 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                   <div className={styles.inputGroup}>
                     <label>Date of Birth:</label>
                     <input
-                        type="date"
-                        name="date_of_birth"
-                        max="2999-12-31"
-                        onChange={handleChange}
+                      type="date"
+                      name="date_of_birth"
+                      max="2999-12-31"
+                      onChange={handleChange}
                     />
                   </div>
 
@@ -147,10 +147,10 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                   <div className={styles.inputGroup}>
                     <label>Test Chamber:</label>
                     <input
-                        type="number"
-                        name="test_chamber"
-                        placeholder="Test Chamber"
-                        onChange={handleChange}
+                      type="number"
+                      name="test_chamber"
+                      placeholder="Test Chamber"
+                      onChange={handleChange}
                     />
                   </div>
 
@@ -158,10 +158,10 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                   <div className={styles.inputGroup}>
                     <label>Score:</label>
                     <input
-                        type="number"
-                        name="score"
-                        placeholder="Score"
-                        onChange={handleChange}
+                      type="number"
+                      name="score"
+                      placeholder="Score"
+                      onChange={handleChange}
                     />
                   </div>
 
@@ -169,19 +169,19 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                   <div className={styles.inputGroup}>
                     <label>Alive:</label>
                     <input
-                        type="checkbox"
-                        name="alive"
-                        checked={formData.alive}
-                        onChange={handleChange}
+                      type="checkbox"
+                      name="alive"
+                      checked={formData.alive}
+                      onChange={handleChange}
                     />
                   </div>
 
                   {/* Submit Button */}
                   <button
-                      type="submit"
-                      className={styles.content}
-                      style={{ width: 'fit-content' }}
-                      disabled={isLoading}
+                    type="submit"
+                    className={styles.content}
+                    style={{ width: 'fit-content' }}
+                    disabled={isLoading}
                   >
                     {isLoading ? 'Creating...' : 'Create Subject'}
                   </button>

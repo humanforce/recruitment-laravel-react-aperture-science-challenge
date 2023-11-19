@@ -270,14 +270,14 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
                       </thead>
                       <tbody>
                       {Array.from(Array(10).keys()).map(subject => (
-                          <tr key={subject}>
-                            <td>&nbsp;</td>
-                            <td>&nbsp;</td>
-                            <td>&nbsp;</td>
-                            <td>&nbsp;</td>
-                            <td>&nbsp;</td>
-                            <td>&nbsp;</td>
-                          </tr>
+                        <tr key={subject}>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                        </tr>
                       ))}
                       </tbody>
                     </table>
