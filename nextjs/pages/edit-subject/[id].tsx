@@ -16,6 +16,7 @@ EditSubject.getInitialProps = ({ req, res }: NextPageContext) => {
 export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostname: string, protocol: string}) {
   const router = useRouter();
   const { id } = router.query;
+  const [ authenticated, setAuth ] = useState<Boolean>(!!props.XSRF_TOKEN);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [messageInfo, setMessageInfo] = useState({ message: '', type: '' });
@@ -29,6 +30,13 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
 
   // Constructing the API endpoint
   const api = `${props.protocol}//${props.hostname}`;
+
+  // Redirect if un-authenticated
+  useEffect(() => {
+    if (!authenticated) {
+      router.push('/');
+    }
+  }, [authenticated]);
 
   useEffect(() => {
     if (id) {

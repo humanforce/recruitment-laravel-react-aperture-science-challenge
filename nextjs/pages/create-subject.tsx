@@ -29,6 +29,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
   // Constructing the API endpoint
   const api = `${props.protocol}//${props.hostname}`;
 
+  // Redirect if un-authenticated
   useEffect(() => {
     if (!authenticated) {
       router.push('/');
