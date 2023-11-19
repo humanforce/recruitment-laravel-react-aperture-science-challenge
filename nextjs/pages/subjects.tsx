@@ -170,6 +170,14 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
     });
   };
 
+  const getSortIcon = (columnKey: keyof Subject) => {
+    if (currentSortColumn === columnKey) {
+      return sortOrder === 'asc' ? '↓' : '↑';
+    }
+    // Default icon when the column is not the current sort column
+    return '↕';
+  };
+
   return (
     <Layout>
       <h1>Testing Subjects</h1>
@@ -189,12 +197,12 @@ export default function Subjects(props: NextPage & {XSRF_TOKEN: string, hostname
                       <td>ID</td>
                       <td>Name</td>
                       <td onClick={() => sortSubjects('date_of_birth')} className={styles.sortableHeader}>
-                        DOB {currentSortColumn === 'date_of_birth' ? (sortOrder === 'asc' ? '↓' : '↑') : '↕'}
+                        DOB {getSortIcon('date_of_birth')}
                       </td>
                       <td>Alive</td>
                       <td>Score</td>
                       <td onClick={() => sortSubjects('test_chamber')} className={styles.sortableHeader}>
-                        Test Chamber {currentSortColumn === 'test_chamber' ? (sortOrder === 'asc' ? '↓' : '↑') : '↕'}
+                        Test Chamber {getSortIcon('test_chamber')}
                       </td>
                     </tr>
                     </thead>
