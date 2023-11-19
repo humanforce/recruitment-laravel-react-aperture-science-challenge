@@ -130,6 +130,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                       name="name"
                       placeholder="Name"
                       onChange={handleChange}
+                      required
                     />
                   </div>
 
@@ -141,6 +142,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                       name="date_of_birth"
                       max="2999-12-31"
                       onChange={handleChange}
+                      required
                     />
                   </div>
 
@@ -152,6 +154,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                       name="test_chamber"
                       placeholder="Test Chamber"
                       onChange={handleChange}
+                      required
                     />
                   </div>
 
@@ -163,6 +166,7 @@ export default function CreateSubject(props: NextPage & {XSRF_TOKEN: string, hos
                       name="score"
                       placeholder="Score"
                       onChange={handleChange}
+                      required
                     />
                   </div>
 
