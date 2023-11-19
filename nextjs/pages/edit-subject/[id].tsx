@@ -183,6 +183,7 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
                           placeholder="Name"
                           value={formData.name}
                           onChange={handleChange}
+                          required
                         />
                       </div>
 
@@ -195,6 +196,7 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
                           max="2999-12-31"
                           value={formData.date_of_birth}
                           onChange={handleChange}
+                          required
                         />
                       </div>
 
@@ -207,6 +209,7 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
                           placeholder="Test Chamber"
                           value={formData.test_chamber}
                           onChange={handleChange}
+                          required
                         />
                       </div>
 
@@ -219,6 +222,7 @@ export default function EditSubject(props: NextPage & {XSRF_TOKEN: string, hostn
                           placeholder="Score"
                           value={formData.score}
                           onChange={handleChange}
+                          required
                         />
                       </div>
 
